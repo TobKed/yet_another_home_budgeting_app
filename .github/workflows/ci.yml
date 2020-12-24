@@ -9,11 +9,9 @@ on:
   pull_request:
     branches: [ "master" ]
     paths-ignore: [ "docs/**" ]
-
   push:
     branches: [ "master" ]
     paths-ignore: [ "docs/**" ]
-
   workflow_dispatch:
     inputs:
 
@@ -21,15 +19,12 @@ jobs:
   pre_commit:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout Code Repository
         uses: actions/checkout@v2
-
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-
       - name: Cache pre-commit env
         uses: actions/cache@v2
         env:
@@ -37,11 +32,9 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: ${{ env.cache-name }}-${{ github.job }}-${{ hashFiles('.pre-commit-config.yaml') }}
-
       - name: Install pre-commit
         run: |
           pip install pre-commit
-
       - name: Run pre-commit
         run: |
           pre-commit run --all-files --show-diff-on-failure --color always
@@ -49,14 +42,25 @@ jobs:
   pytest:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout Code Repository
         uses: actions/checkout@v2
       - name: Build the Stack
         run:  docker-compose -f local.yml build
-
       - name: Run DB Migrations
         run:  docker-compose -f local.yml run --rm django python manage.py migrate
-
       - name: Run Django Tests
         run:  docker-compose -f local.yml run --rm django pytest
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    needs:
+      - pre_commit
+      - pytest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Deploy to Heroku
+        run: git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git master

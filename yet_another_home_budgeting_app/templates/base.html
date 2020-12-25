@@ -1,4 +1,6 @@
-{% load static i18n %}<!DOCTYPE html>
+{% load static i18n %}
+{% load socialaccount %}
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -66,6 +68,9 @@
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
                 <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+              </li>
+              <li class="nav-item">
+                <a id="log-in-link" class="nav-link" href="{% provider_login_url 'google' %}">{% trans "Login with Google" %}</a>
               </li>
             {% endif %}
           </ul>

@@ -94,11 +94,6 @@ class Command(BaseCommand):
                 for i in range(category_path_list_length):
                     parent_category_path_list = category_path_list[slice(0, i)]
                     parent_category_path = "-".join(parent_category_path_list)
-
-                    self.stdout.write(
-                        self.style.WARNING('parent:  "%s"' % str(parent_category_path))
-                    )
-
                     children_category_last_name = category_path_list[slice(i, i + 1)][0]
 
                     children_category_path = (
@@ -107,16 +102,9 @@ class Command(BaseCommand):
                         else children_category_last_name
                     )
 
-                    self.stdout.write(
-                        self.style.WARNING(
-                            'children:  "%s"' % str(children_category_path)
-                        )
-                    )
-
                     if parent_category_path and not self._categories_registry.get(
                         parent_category_path
                     ):
-
                         category_in_db = Category.objects.get_or_create(
                             user=user,
                             name=parent_category_path[-1].capitalize(),
@@ -127,10 +115,15 @@ class Command(BaseCommand):
                         self._categories_registry.update(
                             {parent_category_path: category_in_db.id}
                         )
+                        self.stdout.write(
+                            self.style.INFO(
+                                'Created category:  "%s"\n'
+                                "\tpath: %s"
+                                % (str(category_in_db), parent_category_path)
+                            )
+                        )
 
                     p_id = self._categories_registry.get(parent_category_path)
-
-                    self.stdout.write(self.style.WARNING('p_id:  "%s"' % str(p_id)))
 
                     if not self._categories_registry.get(children_category_path):
                         category_in_db = Category.objects.get_or_create(
@@ -141,7 +134,10 @@ class Command(BaseCommand):
                         self._categories_registry.update(
                             {children_category_path: category_in_db.id}
                         )
-
-        self.stdout.write(
-            self.style.SUCCESS('debug:  "%s"' % str(self._categories_registry))
-        )
+                        self.stdout.write(
+                            self.style.INFO(
+                                'Created category:  "%s"\n'
+                                "\tpath: %s"
+                                % (str(category_in_db), children_category_path)
+                            )
+                        )

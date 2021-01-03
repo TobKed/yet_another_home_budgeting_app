@@ -23,53 +23,42 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         file = options["file"]
         user_email = options["user_email"]
+        user = self._get_user(user_email)
 
+        self.print_info_about_categories_and_expenditures_count(user)
+        self.check_is_file_exists(file)
+
+        categories = self._read_categories_from_csv(file)
+        self._populate_categories(categories, user)
+
+        self.print_info_about_categories_and_expenditures_count(user)
+
+    def _get_user(self, user_email):
         try:
             user = User.objects.get(email=user_email)
+            self.stdout.write(
+                self.style.SUCCESS('Successfully found user: "%s"\n' % user_email)
+            )
+            return user
         except User.DoesNotExist:
             raise CommandError('User with email "%s" does not exist' % user_email)
 
+    def print_info_about_categories_and_expenditures_count(self, user):
         expenditure_count_start = Expenditure.objects.filter(user=user).count()
         category_count_start = Category.objects.filter(user=user).count()
-
         self.stdout.write(
             self.style.SUCCESS(
-                'Successfully found user: "%s"\n'
                 "User Categories count: %d\n"
                 "User Expenditure count: %d"
-                % (user_email, category_count_start, expenditure_count_start)
+                % (category_count_start, expenditure_count_start)
             )
         )
 
+    @staticmethod
+    def check_is_file_exists(file):
+        """Raise error if file does not exists"""
         if not os.path.isfile(file):
             raise CommandError('File "%s" does not exist' % file)
-
-        categories = self._read_categories_from_csv(file)
-        self._categories_registry = {c: None for c in categories}
-        self._populate_categories(categories, user)
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                '_categories_registry  "%s"' % str(self._categories_registry)
-            )
-        )
-
-        expenditure_count_end = Expenditure.objects.filter(user=user).count()
-        category_count_end = Category.objects.filter(user=user).count()
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                "User Categories count: %d\n"
-                "User Expenditure count: %d"
-                % (category_count_end, expenditure_count_end)
-            )
-        )
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                'Successfully executed command. Options:  "%s"' % str(options)
-            )
-        )
 
     def _read_categories_from_csv(self, file):
         category_paths = set()
@@ -82,7 +71,9 @@ class Command(BaseCommand):
 
         return category_paths
 
-    def _populate_categories(self, categories, user, parent_id=None):
+    def _populate_categories(self, categories, user):
+        """Populate self._categories_registry"""
+        self._categories_registry = {c: None for c in categories}
         for category_path in categories:
             if self._categories_registry.get(category_path) is not None:
                 continue

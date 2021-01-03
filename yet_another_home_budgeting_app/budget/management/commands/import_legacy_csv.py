@@ -25,8 +25,8 @@ class Command(BaseCommand):
         user_email = options["user_email"]
         user = self._get_user(user_email)
 
-        self.print_info_about_categories_and_expenditures_count(user)
         self.check_is_file_exists(file)
+        self.print_info_about_categories_and_expenditures_count(user)
 
         categories = self._read_categories_from_csv(file)
         self._populate_categories(categories, user)

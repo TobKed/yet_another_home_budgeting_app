@@ -1,9 +1,13 @@
 import csv
-import os.path
+from typing import List
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 
+from yet_another_home_budgeting_app.budget.management.commands._private import (
+    check_is_file_exists,
+    date_from_string,
+)
 from yet_another_home_budgeting_app.budget.models import Category, Expenditure
 
 User = get_user_model()
@@ -25,15 +29,16 @@ class Command(BaseCommand):
         user_email = options["user_email"]
         user = self._get_user(user_email)
 
-        self.check_is_file_exists(file)
+        check_is_file_exists(file)
         self.print_info_about_categories_and_expenditures_count(user)
 
         categories = self._read_categories_from_csv(file)
         self._populate_categories(categories, user)
+        self._populate_expenditures_from_csv(file, user)
 
         self.print_info_about_categories_and_expenditures_count(user)
 
-    def _get_user(self, user_email):
+    def _get_user(self, user_email: str) -> User:
         try:
             user = User.objects.get(email=user_email)
             self.stdout.write(
@@ -43,7 +48,7 @@ class Command(BaseCommand):
         except User.DoesNotExist:
             raise CommandError('User with email "%s" does not exist' % user_email)
 
-    def print_info_about_categories_and_expenditures_count(self, user):
+    def print_info_about_categories_and_expenditures_count(self, user: User) -> None:
         expenditure_count_start = Expenditure.objects.filter(user=user).count()
         category_count_start = Category.objects.filter(user=user).count()
         self.stdout.write(
@@ -54,24 +59,17 @@ class Command(BaseCommand):
             )
         )
 
-    @staticmethod
-    def check_is_file_exists(file):
-        """Raise error if file does not exists"""
-        if not os.path.isfile(file):
-            raise CommandError('File "%s" does not exist' % file)
-
-    def _read_categories_from_csv(self, file):
+    def _read_categories_from_csv(self, file: str) -> List[str]:
         category_paths = set()
         with open(file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=",")
             for row in reader:
                 category = row[2]
-
                 category_paths.add(category)
 
         return category_paths
 
-    def _populate_categories(self, categories, user):
+    def _populate_categories(self, categories: List[str], user: User) -> None:
         """Populate self._categories_registry"""
         self._categories_registry = {c: None for c in categories}
         for category_path in categories:
@@ -121,3 +119,23 @@ class Command(BaseCommand):
                             "\tpath: %s" % (str(category_in_db), children_category_path)
                         )
                     )
+
+    def _populate_expenditures_from_csv(
+        self,
+        file: str,
+        user: User,
+    ) -> None:
+        with open(file, newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=",")
+            for row in reader:
+                date = date_from_string(row[0])
+                value = float(row[1])
+                category = row[2]
+                comment = row[3] or None
+                Expenditure.objects.get_or_create(
+                    user=user,
+                    value=value,
+                    spent_at=date,
+                    comment=comment,
+                    category_id=self._categories_registry[category],
+                )

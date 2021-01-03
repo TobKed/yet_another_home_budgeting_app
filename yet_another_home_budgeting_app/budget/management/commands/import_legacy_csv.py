@@ -59,7 +59,8 @@ class Command(BaseCommand):
             )
         )
 
-    def _read_categories_from_csv(self, file: str) -> List[str]:
+    @staticmethod
+    def _read_categories_from_csv(file: str) -> List[str]:
         category_paths = set()
         with open(file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=",")

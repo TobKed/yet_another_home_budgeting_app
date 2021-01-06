@@ -27,6 +27,10 @@ urlpatterns = [
             url=staticfiles_storage.url("images/favicons/favicon.ico")
         ),
     ),
+    path(
+        "budget/",
+        include("yet_another_home_budgeting_app.budget.urls", namespace="budget"),
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # API URLS

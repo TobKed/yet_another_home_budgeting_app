@@ -72,11 +72,13 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "mptt",
 ]
 
 LOCAL_APPS = [
     "yet_another_home_budgeting_app.users.apps.UsersConfig",
     # Your stuff: custom apps go here
+    "yet_another_home_budgeting_app.budget.apps.BudgetConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

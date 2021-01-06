@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
     image: yet_another_home_budgeting_app_local_django
-    container_name: django
+    container_name: yet_another_home_budgeting_app_local_django
     depends_on:
       - postgres
       - mailhog
@@ -27,8 +27,8 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: yet_another_home_budgeting_app_production_postgres
-    container_name: postgres
+    image: yet_another_home_budgeting_app_local_postgres
+    container_name: yet_another_home_budgeting_app_local_postgres
     volumes:
       - local_postgres_data:/var/lib/postgresql/data:Z
       - local_postgres_data_backups:/backups:z
@@ -37,7 +37,7 @@ services:
 
   docs:
     image: yet_another_home_budgeting_app_local_docs
-    container_name: docs
+    container_name: yet_another_home_budgeting_app_local_docs
     build:
       context: .
       dockerfile: ./compose/local/docs/Dockerfile
@@ -53,6 +53,6 @@ services:
 
   mailhog:
     image: mailhog/mailhog:v1.0.0
-    container_name: mailhog
+    container_name: yet_another_home_budgeting_app_local_mailhog
     ports:
       - "8025:8025"

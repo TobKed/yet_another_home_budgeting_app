@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% load mptt_tags %}
+
+{% block title %}Expenditures{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="container d-flex justify-content-between">
+          <h2 class="d-inline-block mt-2">Expenditure details</h2>
+        </div>
+        <div class="table-responsive">
+          <table id="machineListTable" class="table table-bordered table-striped table-hover table-sm">
+            <thead>
+            <tr class="text-nowrap">
+              <th scope="col">Value</th>
+              <th scope="col">Spent at</th>
+              <th scope="col">Category</th>
+              <th scope="col">Comment</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="text-nowrap">{{ object.value }}</td>
+              <td class="text-nowrap">{{ object.spent_at }}</td>
+              <td class="text-nowrap">{{ object.category }}</td>
+              <td>{% if object.comment %}{{ object.comment }}{% endif %}</td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="clearfix"></div>
+        </div>
+      </div> <!-- end col-md-12 -->
+    </div> <!-- end row -->
+
+    <div class="row">
+      <div class="col-md-12">
+        <a class="btn btn-secondary mt-1 mb-1"
+           href="{% url 'budget:expenditure_update_view' object.id %}">Update</a>
+        <a class="btn btn-danger mt-1 mb-1"
+           href="{% url 'budget:expenditure_delete_view' object.id %}">Delete</a>
+        <a class="btn btn-info mt-1 mb-1" role="button"
+           href="{% url 'budget:expenditure_list_view' %}">Back</a>
+      </div> <!-- end col-md-12 -->
+    </div> <!-- end row -->
+  </div>  <!-- end containter -->
+
+{% endblock content %}

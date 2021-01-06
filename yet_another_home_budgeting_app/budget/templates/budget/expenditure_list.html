@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% load mptt_tags %}
+
+{% block title %}Expenditures{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="container d-flex justify-content-between">
+          <h2 class="d-inline-block mt-2">Expenditures</h2>
+        </div>
+        <div class="table-responsive">
+          <table id="machineListTable" class="table table-bordered table-striped table-hover table-sm">
+            <thead>
+            <tr class="text-nowrap">
+              <th scope="col">#</th>
+              <th scope="col">Value</th>
+              <th scope="col">Spent at</th>
+              <th scope="col">Category</th>
+              <th scope="col">Comment</th>
+              <th scope="col"></th>
+              <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for object in object_list %}
+              <tr>
+                <th scope="row"
+                    class="text-nowrap">{{ page_obj.start_index|add:forloop.counter0 }}</th>
+                <td class="text-nowrap">{{ object.value }}</td>
+                <td class="text-nowrap">{{ object.spent_at }}</td>
+                <td class="text-nowrap">{{ object.category }}</td>
+                <td>{% if object.comment %}{{ object.comment }}{% endif %}</td>
+                <td>
+                  <a href="{% url 'budget:expenditure_detail_view' object.id %}"
+                     class="btn btn-info btn-xs">
+                    <span class="fas fa-info xs" data-toggle="tooltip" title="Info"></span>
+                  </a>
+                </td>
+                <td>
+                  <a href="{% url 'budget:expenditure_update_view' object.id %}"
+                     class="btn btn-secondary btn-xs">
+                    <span class="fas fa-edit xs" data-toggle="tooltip" title="Edit"></span>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          <div class="clearfix"></div>
+
+          <!-- PAGINATOR START-->
+          <div id="pagination">
+            {% include 'paginator.html' %}
+          </div>
+          <!-- PAGINATOR END -->
+
+        </div>
+      </div> <!-- end col-md-12 -->
+    </div> <!-- end row -->
+  </div>  <!-- end containter -->
+
+{% endblock content %}

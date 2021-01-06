@@ -2,6 +2,8 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
+from django.utils.functional import cached_property
 from mptt.models import MPTTModel, TreeForeignKey
 
 User = settings.AUTH_USER_MODEL
@@ -20,11 +22,15 @@ class Category(MPTTModel):
     class MPTTMeta:
         order_insertion_by = ["name"]
 
+    @cached_property
+    def readable_path(self):
+        return " - ".join(c.name for c in self.get_ancestors(include_self=True))
+
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, user={self.user})"
 
     def __str__(self):
-        return self.__repr__()
+        return self.readable_path
 
 
 class Expenditure(models.Model):
@@ -53,3 +59,6 @@ class Expenditure(models.Model):
 
     def __str__(self):
         return self.__repr__()
+
+    def get_absolute_url(self):
+        return reverse("budget:expenditure_detail_view", kwargs={"pk": self.pk})

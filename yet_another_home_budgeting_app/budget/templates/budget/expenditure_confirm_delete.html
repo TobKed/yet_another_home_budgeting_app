@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% load mptt_tags %}
+{% load crispy_forms_tags %}
+
+{% block title %}Expenditure - Form{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="content-section">
+          <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+              <legend class="border-bottom mb-4">Delete Expenditure</legend>
+              <h2>Are you sure you want to delete the expenditure:</h2>
+              <div class="table-responsive">
+                <table id="machineListTable" class="table table-bordered table-striped table-hover table-sm">
+                  <thead>
+                  <tr class="text-nowrap">
+                    <th scope="col">Value</th>
+                    <th scope="col">Spent at</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Comment</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td class="text-nowrap">{{ object.value }}</td>
+                    <td class="text-nowrap">{{ object.spent_at }}</td>
+                    <td class="text-nowrap">{{ object.category }}</td>
+                    <td>{% if object.comment %}{{ object.comment }}{% endif %}</td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div class="clearfix"></div>
+              </div>
+            </fieldset>
+            <div class="form-group">
+              <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>
+              <a class="btn btn-outline-secondary"
+                 href="{% url 'budget:expenditure_detail_view' object.id %}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div> <!-- end col-md-12 -->
+    </div> <!-- end row -->
+  </div>  <!-- end containter -->
+
+{% endblock content %}

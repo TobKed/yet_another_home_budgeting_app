@@ -42,7 +42,7 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(email=user_email)
             self.stdout.write(
-                self.style.SUCCESS('Successfully found user: "%s"\n' % user_email)
+                self.style.SUCCESS('Successfully found user: "%s"' % user_email)
             )
             return user
         except User.DoesNotExist:

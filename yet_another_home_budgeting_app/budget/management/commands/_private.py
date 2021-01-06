@@ -9,6 +9,10 @@ def date_from_string(date_time_str: str) -> datetime:
     return datetime.strptime(date_time_str, "%Y-%m-%d %H:%M:%S")
 
 
+def date_to_string(dt: datetime) -> str:
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def check_is_file_exists(file: str) -> None:
     """Raise error if file does not exists"""
     if not os.path.isfile(file):

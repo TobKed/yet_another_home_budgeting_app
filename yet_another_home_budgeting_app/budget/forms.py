@@ -10,7 +10,10 @@ class ExpenditureForm(forms.ModelForm):
     category = TreeNodeChoiceField(queryset=Category.objects.all())
     spent_at = forms.DateTimeField(
         initial=datetime.now,
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        input_formats=["%Y-%m-%dT%H:%M"],
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+        ),
     )
 
     class Meta:
